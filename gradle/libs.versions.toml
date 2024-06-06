@@ -1,0 +1,204 @@
+#
+# Copyright 2023 Datastrato Pvt Ltd.
+# This software is licensed under the Apache License version 2.
+#
+[versions]
+junit = "5.8.1"
+protoc = "3.24.4"
+jackson = "2.15.2"
+guava = "32.1.3-jre"
+lombok = "1.18.20"
+slf4j = "2.0.9"
+log4j = "2.22.0"
+jetty = "9.4.51.v20230217"
+jersey = "2.41"
+mockito = "4.11.0"
+airlift-json = "237"
+airlift-log = "231"
+airlift-units = "1.8"
+hive2 = "2.3.9"
+hadoop2 = "2.10.2"
+hadoop3 = "3.1.0"
+hadoop-minikdc = "3.3.6"
+httpclient5 = "5.2.1"
+mockserver = "5.15.0"
+commons-lang3 = "3.14.0"
+commons-io = "2.15.0"
+commons-collections4 = "4.4"
+commons-dbcp2 = "2.11.0"
+caffeine = "2.9.3"
+rocksdbjni = "7.10.2"
+iceberg = '1.3.1' # used for Gravitino Iceberg catalog and Iceberg REST service
+iceberg4spark = "1.4.1" # used for compile spark connector
+spark33 = "3.3.4"
+spark34 = "3.4.3"
+spark35 = "3.5.1"
+kyuubi4spark33 = "1.7.4"
+kyuubi4spark34 = "1.8.2"
+kyuubi4spark35 = "1.9.0"
+trino = '435'
+scala-collection-compat = "2.7.0"
+scala-java-compat = "1.0.2"
+sqlite-jdbc = "3.42.0.0"
+testcontainers = "1.19.0"
+jwt = "0.11.1"
+jline = "3.21.0"
+okhttp3 = "4.11.0"
+metrics = "4.2.25"
+prometheus = "0.16.0"
+jsqlparser = "4.2"
+mysql = "8.0.23"
+postgresql = "42.6.0"
+immutables-value = "2.10.0"
+selenium = "3.141.59"
+rauschig = "1.2.0"
+mybatis = "3.5.6"
+h2db = "1.4.200"
+kafka = "3.4.0"
+curator = "2.12.0"
+awaitility = "4.2.1"
+servlet = "3.1.0"
+jodd = "3.5.2"
+flink = "1.18.0"
+ranger = "2.4.0"
+
+protobuf-plugin = "0.9.2"
+spotless-plugin = '6.11.0'
+gradle-extensions-plugin = '1.74'
+publish-plugin = '1.2.0'
+rat-plugin = '0.8.0'
+shadow-plugin = "8.1.1"
+kerby = "2.0.3"
+node-plugin = "7.0.1"
+commons-cli = "1.2"
+sun-activation-version = "1.2.0"
+error-prone = "3.1.0"
+gravitino = "0.5.1"
+
+[libraries]
+protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protoc" }
+protobuf-java-util = { group = "com.google.protobuf", name = "protobuf-java-util", version.ref = "protoc" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jackson" }
+jackson-datatype-jdk8 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jdk8", version.ref = "jackson" }
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+kerby-core = { group = "org.apache.kerby", name = "kerb-core", version.ref = "kerby"}
+kerby-simplekdc = { group = "org.apache.kerby", name = "kerb-simplekdc", version.ref = "kerby"}
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine"}
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
+slf4j-jdk14 = { group = "org.slf4j", name = "slf4j-jdk14", version = "1.7.30" }
+log4j-slf4j2-impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j" }
+log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
+log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+log4j-12-api = { group = "org.apache.logging.log4j", name = "log4j-1.2-api", version.ref = "log4j" }
+jetty-server = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jetty" }
+jetty-servlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jetty" }
+jetty-servlets = { group = "org.eclipse.jetty", name = "jetty-servlets", version.ref = "jetty" }
+jetty-webapp = { group = "org.eclipse.jetty", name = "jetty-webapp", version.ref = "jetty" }
+jersey-server = { group = "org.glassfish.jersey.core", name = "jersey-server", version.ref = "jersey" }
+jersey-container-servlet-core = { group = "org.glassfish.jersey.containers", name = "jersey-container-servlet-core", version.ref = "jersey" }
+jersey-container-jetty-http = { group = "org.glassfish.jersey.containers", name = "jersey-container-jetty-http", version.ref = "jersey" }
+jersey-media-json-jackson = { group = "org.glassfish.jersey.media", name = "jersey-media-json-jackson", version.ref = "jersey" }
+jersey-hk2 = { group = "org.glassfish.jersey.inject", name = "jersey-hk2", version.ref = "jersey" }
+jersey-test-framework-core = { group = "org.glassfish.jersey.test-framework", name = "jersey-test-framework-core", version.ref = "jersey" }
+jersey-test-framework-provider-jetty = { group = "org.glassfish.jersey.test-framework.providers", name = "jersey-test-framework-provider-jetty", version.ref = "jersey" }
+jodd-core = { group = "org.jodd", name = "jodd-core", version.ref = "jodd" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+hive2-metastore = { group = "org.apache.hive", name = "hive-metastore", version.ref = "hive2"}
+hive2-exec = { group = "org.apache.hive", name = "hive-exec", version.ref = "hive2"}
+hive2-common = { group = "org.apache.hive", name = "hive-common", version.ref = "hive2"}
+hadoop2-hdfs = { group = "org.apache.hadoop", name = "hadoop-hdfs", version.ref = "hadoop2" }
+hadoop2-common = { group = "org.apache.hadoop", name = "hadoop-common", version.ref = "hadoop2"}
+hadoop2-mapreduce-client-core = { group = "org.apache.hadoop", name = "hadoop-mapreduce-client-core", version.ref = "hadoop2"}
+hadoop3-hdfs = { group = "org.apache.hadoop", name = "hadoop-hdfs", version.ref = "hadoop3" }
+hadoop3-common = { group = "org.apache.hadoop", name = "hadoop-common", version.ref = "hadoop3"}
+hadoop3-client = { group = "org.apache.hadoop", name = "hadoop-client", version.ref = "hadoop3"}
+hadoop3-mapreduce-client-core = { group = "org.apache.hadoop", name = "hadoop-mapreduce-client-core", version.ref = "hadoop3"}
+hadoop3-minicluster = { group = "org.apache.hadoop", name = "hadoop-minicluster", version.ref = "hadoop-minikdc"}
+airlift-json = { group = "io.airlift", name = "json", version.ref = "airlift-json"}
+airlift-units = { group = "io.airlift", name = "units", version.ref = "airlift-units"}
+airlift-log = { group = "io.airlift", name = "log", version.ref = "airlift-log"}
+httpclient5 = { group = "org.apache.httpcomponents.client5", name = "httpclient5", version.ref = "httpclient5" }
+mockserver-netty = { group = "org.mock-server", name = "mockserver-netty", version.ref = "mockserver" }
+mockserver-client-java = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+rocksdbjni = { group = "org.rocksdb", name = "rocksdbjni", version.ref = "rocksdbjni" }
+commons-collections4 = { group = "org.apache.commons", name = "commons-collections4", version.ref = "commons-collections4" }
+iceberg-core = { group = "org.apache.iceberg", name = "iceberg-core", version.ref = "iceberg" }
+iceberg-api = { group = "org.apache.iceberg", name = "iceberg-api", version.ref = "iceberg" }
+iceberg-hive-metastore = { group = "org.apache.iceberg", name = "iceberg-hive-metastore", version.ref = "iceberg" }
+trino-spi= { group = "io.trino", name = "trino-spi", version.ref = "trino" }
+trino-toolkit= { group = "io.trino", name = "trino-plugin-toolkit", version.ref = "trino" }
+trino-testing= { group = "io.trino", name = "trino-testing", version.ref = "trino" }
+trino-memory= { group = "io.trino", name = "trino-memory", version.ref = "trino" }
+trino-cli= { group = "io.trino", name = "trino-cli", version.ref = "trino" }
+trino-client= { group = "io.trino", name = "trino-client", version.ref = "trino" }
+sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite-jdbc" }
+commons-dbcp2 = { group = "org.apache.commons", name = "commons-dbcp2", version.ref = "commons-dbcp2" }
+testcontainers = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
+testcontainers-mysql = { group = "org.testcontainers", name = "mysql", version.ref = "testcontainers" }
+testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testcontainers" }
+trino-jdbc = { group = "io.trino", name = "trino-jdbc", version.ref = "trino" }
+jwt-api = { group = "io.jsonwebtoken", name = "jjwt-api", version.ref = "jwt"}
+jwt-impl = { group = "io.jsonwebtoken", name = "jjwt-impl", version.ref = "jwt"}
+jwt-gson = { group = "io.jsonwebtoken", name = "jjwt-gson", version.ref = "jwt"}
+metrics-core = { group = "io.dropwizard.metrics", name = "metrics-core", version.ref = "metrics" }
+metrics-jersey2 = { group = "io.dropwizard.metrics", name = "metrics-jersey2", version.ref = "metrics" }
+metrics-jvm = { group = "io.dropwizard.metrics", name = "metrics-jvm", version.ref = "metrics" }
+metrics-jmx = { group = "io.dropwizard.metrics", name = "metrics-jmx", version.ref = "metrics" }
+jline-terminal = { group = "org.jline", name = "jline-terminal", version.ref = "jline" }
+okhttp3-loginterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3" }
+metrics-servlets = { group = "io.dropwizard.metrics", name = "metrics-servlets", version.ref = "metrics" }
+prometheus-client = { group = "io.prometheus", name = "simpleclient", version.ref = "prometheus" }
+prometheus-dropwizard = { group = "io.prometheus", name = "simpleclient_dropwizard", version.ref = "prometheus" }
+prometheus-servlet = { group = "io.prometheus", name = "simpleclient_servlet", version.ref = "prometheus" }
+jsqlparser = { group = "com.github.jsqlparser", name = "jsqlparser", version.ref = "jsqlparser" }
+mysql-driver = { group = "mysql", name = "mysql-connector-java", version.ref = "mysql" }
+postgresql-driver = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+minikdc = { group = "org.apache.hadoop", name = "hadoop-minikdc", version.ref = "hadoop-minikdc"}
+immutables-value = { module = "org.immutables:value", version.ref = "immutables-value" }
+commons-cli = { group = "commons-cli", name = "commons-cli", version.ref = "commons-cli" }
+sun-activation = { group = "com.sun.activation", name = "javax.activation", version.ref = "sun-activation-version" }
+kafka-clients = { group = "org.apache.kafka", name = "kafka-clients", version.ref = "kafka" }
+kafka = { group = "org.apache.kafka", name = "kafka_2.12", version.ref = "kafka" }
+curator-test = { group = "org.apache.curator", name = "curator-test", version.ref = "curator"}
+ranger-intg = { group = "org.apache.ranger", name = "ranger-intg", version.ref = "ranger" }
+selenium = { group = "org.seleniumhq.selenium", name = "selenium-java", version.ref = "selenium" }
+rauschig = { group = "org.rauschig", name = "jarchivelib", version.ref = "rauschig" }
+mybatis = { group = "org.mybatis", name = "mybatis", version.ref = "mybatis"}
+h2db = { group = "com.h2database", name = "h2", version.ref = "h2db"}
+awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
+servlet = { group = "javax.servlet", name = "javax.servlet-api", version.ref = "servlet" }
+gravitino-core = { group = "com.datastrato.gravitino", name = "core", version.ref = "gravitino" }
+gravitino-server-common = { group = "com.datastrato.gravitino", name = "server-common", version.ref = "gravitino" }
+
+[bundles]
+log4j = ["slf4j-api", "log4j-slf4j2-impl", "log4j-api", "log4j-core", "log4j-12-api"]
+jetty = ["jetty-server", "jetty-servlet", "jetty-webapp", "jetty-servlets"]
+jersey = ["jersey-server", "jersey-container-servlet-core", "jersey-container-jetty-http", "jersey-media-json-jackson", "jersey-hk2"]
+iceberg = ["iceberg-core", "iceberg-api"]
+jwt = ["jwt-api", "jwt-impl", "jwt-gson"]
+metrics = ["metrics-core", "metrics-jersey2", "metrics-jvm", "metrics-jmx", "metrics-servlets"]
+prometheus = ["prometheus-servlet", "prometheus-dropwizard", "prometheus-client"]
+kerby = ["kerby-core", "kerby-simplekdc"]
+gravitino = ["gravitino-core", "gravitino-server-common"]
+
+[plugins]
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless-plugin" }
+gradle-extensions = { id = "com.github.vlsi.gradle-extensions", version.ref = "gradle-extensions-plugin" }
+publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "publish-plugin" }
+rat = { id = "org.nosphere.apache.rat", version.ref = "rat-plugin" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-plugin" }
+node = { id = "com.github.node-gradle.node", version.ref = "node-plugin" }
+tasktree = {id = "com.dorongold.task-tree", version = "2.1.1"}
+dependencyLicenseReport = {id = "com.github.jk1.dependency-license-report", version = "2.5"}
+bom = {id = "org.cyclonedx.bom", version = "1.5.0"}
+errorprone = {id = "net.ltgt.errorprone", version.ref = "error-prone"}
