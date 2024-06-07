@@ -2,8 +2,6 @@
  * Copyright 2023 Datastrato Pvt Ltd.
  * This software is licensed under the Apache License version 2.
  */
-import com.github.gradle.node.NodeExtension
-import com.github.gradle.node.NodePlugin
 import com.github.jk1.license.filter.DependencyFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.InventoryHtmlReportRenderer
@@ -12,11 +10,6 @@ import com.github.vlsi.gradle.dsl.configureEach
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.internal.hash.ChecksumService
-import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.support.serviceOf
-import java.io.File
-import java.io.IOException
 import java.util.Locale
 
 plugins {
