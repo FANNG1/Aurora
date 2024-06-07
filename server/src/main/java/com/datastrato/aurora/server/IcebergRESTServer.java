@@ -4,13 +4,24 @@
  */
 package com.datastrato.aurora.server;
 
-import com.datastrato.gravitino.GravitinoEnv;
-import com.datastrato.gravitino.server.authentication.ServerAuthenticator;
+import com.datastrato.aurora.iceberg.IcebergConfig;
+import com.datastrato.aurora.iceberg.IcebergTableOps;
+import com.datastrato.aurora.web.IcebergExceptionMapper;
+import com.datastrato.aurora.web.IcebergObjectMapperProvider;
+import com.datastrato.aurora.web.metrics.IcebergMetricsManager;
+import com.datastrato.gravitino.metrics.MetricsSystem;
+import com.datastrato.gravitino.metrics.source.JVMMetricsSource;
+import com.datastrato.gravitino.metrics.source.MetricsSource;
+import com.datastrato.gravitino.server.web.HttpServerMetricsSource;
 import com.datastrato.gravitino.server.web.JettyServer;
 import com.datastrato.gravitino.server.web.JettyServerConfig;
 import java.io.File;
 import java.util.Properties;
+import javax.servlet.Servlet;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,51 +29,85 @@ public class IcebergRESTServer extends ResourceConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(IcebergRESTServer.class);
 
-  public static final String CONF_FILE = "gravitino.conf";
-
-  public static final String WEBSERVER_CONF_PREFIX = "gravitino.server.webserver.";
-
-  public static final String SERVER_NAME = "Gravitino-webserver";
+  public static final String CONF_FILE = "aurora.conf";
 
   private final ServerConfig serverConfig;
 
   private final JettyServer server;
 
-  private final GravitinoEnv gravitinoEnv;
+  private final MetricsSystem metricsSystem;
+
+  public static final String SERVICE_NAME = "iceberg-rest";
+  public static final String ICEBERG_SPEC = "/iceberg/*";
+
+  private IcebergTableOps icebergTableOps;
+  private IcebergMetricsManager icebergMetricsManager;
 
   public IcebergRESTServer(ServerConfig config) {
-    serverConfig = config;
-    server = new JettyServer();
-    gravitinoEnv = GravitinoEnv.getInstance();
+    this.serverConfig = config;
+    this.server = new JettyServer();
+    this.metricsSystem = new MetricsSystem();
   }
 
-  public void initialize() {
-    gravitinoEnv.initialize(serverConfig);
+  public void initialize(IcebergConfig icebergConfig) {
+    JettyServerConfig serverConfig = JettyServerConfig.fromConfig(icebergConfig);
+    server.initialize(serverConfig, SERVICE_NAME, false /* shouldEnableUI */);
 
-    JettyServerConfig jettyServerConfig =
-        JettyServerConfig.fromConfig(serverConfig, WEBSERVER_CONF_PREFIX);
-    server.initialize(jettyServerConfig, SERVER_NAME, true /* shouldEnableUI */);
+    metricsSystem.register(new JVMMetricsSource());
 
-    ServerAuthenticator.getInstance().initialize(serverConfig);
+    ResourceConfig config = new ResourceConfig();
+    config.packages("com.datastrato.aurora.web.rest");
 
-    // initialize Jersey REST API resources.
-    initializeRestApi();
+    config.register(IcebergObjectMapperProvider.class).register(JacksonFeature.class);
+    config.register(IcebergExceptionMapper.class);
+    HttpServerMetricsSource httpServerMetricsSource =
+        new HttpServerMetricsSource(MetricsSource.ICEBERG_REST_SERVER_METRIC_NAME, config, server);
+    metricsSystem.register(httpServerMetricsSource);
+
+    icebergTableOps = new IcebergTableOps(icebergConfig);
+    icebergMetricsManager = new IcebergMetricsManager(icebergConfig);
+    config.register(
+        new AbstractBinder() {
+          @Override
+          protected void configure() {
+            bind(icebergTableOps).to(IcebergTableOps.class).ranked(1);
+            bind(icebergMetricsManager).to(IcebergMetricsManager.class).ranked(1);
+          }
+        });
+
+    Servlet servlet = new ServletContainer(config);
+    server.addServlet(servlet, ICEBERG_SPEC);
+    server.addCustomFilters(ICEBERG_SPEC);
+    server.addSystemFilters(ICEBERG_SPEC);
   }
 
-  private void initializeRestApi() {}
-
-  public void start() throws Exception {
-    gravitinoEnv.start();
-    server.start();
+  public void start() {
+    icebergMetricsManager.start();
+    if (server != null) {
+      try {
+        server.start();
+        LOG.info("Iceberg REST service started");
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   public void join() {
     server.join();
   }
 
-  public void stop() {
-    server.stop();
-    gravitinoEnv.shutdown();
+  public void stop() throws Exception {
+    if (server != null) {
+      server.stop();
+      LOG.info("Iceberg REST service stopped");
+    }
+    if (icebergTableOps != null) {
+      icebergTableOps.close();
+    }
+    if (icebergMetricsManager != null) {
+      icebergMetricsManager.close();
+    }
   }
 
   public static void main(String[] args) {
@@ -70,10 +115,10 @@ public class IcebergRESTServer extends ResourceConfig {
     String confPath = System.getenv("GRAVITINO_TEST") == null ? "" : args[0];
     ServerConfig serverConfig = loadConfig(confPath);
     IcebergRESTServer server = new IcebergRESTServer(serverConfig);
-    server.initialize();
+    IcebergConfig config = new IcebergConfig();
+    server.initialize(config);
 
     try {
-      // Instantiates GravitinoServer
       server.start();
     } catch (Exception e) {
       LOG.error("Error while running jettyServer", e);

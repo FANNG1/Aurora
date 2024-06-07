@@ -12,8 +12,8 @@ import com.datastrato.gravitino.config.ConfigEntry;
 public class ServerConfig extends Config {
 
   public static final ConfigEntry<Integer> SERVER_SHUTDOWN_TIMEOUT =
-      new ConfigBuilder("gravitino.server.shutdown.timeout")
-          .doc("The stop idle timeout(millis) of the Gravitino Server")
+      new ConfigBuilder("server.shutdown.timeout")
+          .doc("The stop idle timeout(millis) of the Iceberg REST server")
           .version("0.1.0")
           .intConf()
           .checkValue(value -> value > 0, ConfigConstants.POSITIVE_NUMBER_ERROR_MSG)
