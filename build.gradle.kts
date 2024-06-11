@@ -17,7 +17,6 @@ plugins {
   id("java")
   id("idea")
   id("jacoco")
-  id("com.autonomousapps.dependency-analysis") version "0.74.0"
   alias(libs.plugins.gradle.extensions)
   alias(libs.plugins.node) apply false
 
