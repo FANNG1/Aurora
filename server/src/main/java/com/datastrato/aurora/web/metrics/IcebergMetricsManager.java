@@ -1,11 +1,11 @@
 /*
- *  Copyright 2023 Datastrato Pvt Ltd.
+ *  Copyright 2024 Datastrato Pvt Ltd.
  *  This software is licensed under the Apache License version 2.
  */
 
 package com.datastrato.aurora.web.metrics;
 
-import com.datastrato.aurora.iceberg.IcebergConfig;
+import com.datastrato.aurora.config.IcebergServerConfig;
 import com.datastrato.aurora.iceberg.IcebergTableOps;
 import com.datastrato.aurora.web.IcebergRestUtils;
 import com.google.common.annotations.VisibleForTesting;
@@ -46,10 +46,10 @@ public class IcebergMetricsManager {
   private volatile boolean isClosed = false;
   private Optional<ScheduledExecutorService> metricsCleanerExecutor = Optional.empty();
 
-  public IcebergMetricsManager(IcebergConfig icebergConfig) {
+  public IcebergMetricsManager(IcebergServerConfig icebergConfig) {
     icebergMetricsFormatter = new IcebergMetricsFormatter();
     icebergMetricsStore =
-        loadIcebergMetricsStore(icebergConfig.get(IcebergConfig.ICEBERG_METRICS_STORE));
+        loadIcebergMetricsStore(icebergConfig.get(IcebergServerConfig.ICEBERG_METRICS_STORE));
     try {
       icebergMetricsStore.init(icebergConfig.getAllConfig());
     } catch (IOException e) {
@@ -57,7 +57,7 @@ public class IcebergMetricsManager {
       throw new RuntimeException(e);
     }
 
-    retainDays = icebergConfig.get(IcebergConfig.ICEBERG_METRICS_STORE_RETAIN_DAYS);
+    retainDays = icebergConfig.get(IcebergServerConfig.ICEBERG_METRICS_STORE_RETAIN_DAYS);
     if (retainDays > 0) {
       metricsCleanerExecutor =
           Optional.of(
@@ -71,7 +71,7 @@ public class IcebergMetricsManager {
                       .build()));
     }
 
-    int queueCapacity = icebergConfig.get(IcebergConfig.ICEBERG_METRICS_QUEUE_CAPACITY);
+    int queueCapacity = icebergConfig.get(IcebergServerConfig.ICEBERG_METRICS_QUEUE_CAPACITY);
     queue = new LinkedBlockingQueue(queueCapacity);
     metricsWriterThread = new Thread(() -> writeMetrics());
     metricsWriterThread.setName("Iceberg-metrics-writer");
