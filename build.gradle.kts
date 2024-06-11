@@ -350,133 +350,72 @@ jacoco {
 
 apply(plugin = "com.dorongold.task-tree")
 
-/*
-project.extra["docker_it_test"] = false
-project.extra["dockerRunning"] = false
-project.extra["macDockerConnector"] = false
-project.extra["isOrbStack"] = false
+tasks {
+  val projectDir = layout.projectDirectory
+  val outputDir = projectDir.dir("distribution")
 
-// The following is to check the docker status and print the tip message
-fun printDockerCheckInfo() {
-  checkMacDockerConnector()
-  checkDockerStatus()
-  checkOrbStackStatus()
+  val compileDistribution by registering {
+    dependsOn("copySubprojectDependencies", "copySubprojectLib")
 
-  val testMode = project.properties["testMode"] as? String ?: "embedded"
-  if (testMode != "deploy" && testMode != "embedded") {
-    return
-  }
-  val dockerRunning = project.extra["dockerRunning"] as? Boolean ?: false
-  val macDockerConnector = project.extra["macDockerConnector"] as? Boolean ?: false
-  val isOrbStack = project.extra["isOrbStack"] as? Boolean ?: false
-
-  if (OperatingSystem.current().isMacOsX() &&
-    dockerRunning &&
-    (macDockerConnector || isOrbStack)
-  ) {
-    project.extra["docker_it_test"] = true
-  } else if (OperatingSystem.current().isLinux() && dockerRunning) {
-    project.extra["docker_it_test"] = true
-  }
-
-  println("------------------ Check Docker environment ---------------------")
-  println("Docker server status ............................................ [${if (dockerRunning) "running" else "stop"}]")
-  if (OperatingSystem.current().isMacOsX()) {
-    println("mac-docker-connector status ..................................... [${if (macDockerConnector) "running" else "stop"}]")
-    println("OrbStack status ................................................. [${if (dockerRunning && isOrbStack) "yes" else "no"}]")
-  }
-
-  val docker_it_test = project.extra["docker_it_test"] as? Boolean ?: false
-  if (!docker_it_test) {
-    println("Run test cases without `gravitino-docker-it` tag ................ [$testMode test]")
-  } else {
-    println("Using Gravitino IT Docker container to run all integration tests. [$testMode test]")
-  }
-  println("-----------------------------------------------------------------")
-
-  // Print help message if Docker server or mac-docker-connector is not running
-  printDockerServerTip()
-  printMacDockerTip()
-}
-
-fun printDockerServerTip() {
-  val dockerRunning = project.extra["dockerRunning"] as? Boolean ?: false
-  if (!dockerRunning) {
-    val redColor = "\u001B[31m"
-    val resetColor = "\u001B[0m"
-    println("Tip: Please make sure to start the ${redColor}Docker server$resetColor before running the integration tests.")
-  }
-}
-
-fun printMacDockerTip() {
-  val macDockerConnector = project.extra["macDockerConnector"] as? Boolean ?: false
-  val isOrbStack = project.extra["isOrbStack"] as? Boolean ?: false
-  if (OperatingSystem.current().isMacOsX() && !macDockerConnector && !isOrbStack) {
-    val redColor = "\u001B[31m"
-    val resetColor = "\u001B[0m"
-    println(
-      "Tip: Please make sure to use ${redColor}OrbStack$resetColor or execute the " +
-        "$redColor`dev/docker/tools/mac-docker-connector.sh`$resetColor script before running" +
-        " the integration test on macOS."
-    )
-  }
-}
-
-fun checkMacDockerConnector() {
-  if (!OperatingSystem.current().isMacOsX()) {
-    // Only MacOs requires the use of `docker-connector`
-    return
-  }
-
-  try {
-    val processName = "docker-connector"
-    val command = "pgrep -x -q $processName"
-
-    val execResult = project.exec {
-      commandLine("bash", "-c", command)
+    group = "aurora distribution"
+    outputs.dir(projectDir.dir("distribution/package"))
+    doLast {
+      copy {
+        from(projectDir.dir("conf")) { into("package/conf") }
+        from(projectDir.dir("bin")) { into("package/bin") }
+        from(projectDir.dir("scripts")) { into("package/scripts") }
+        into(outputDir)
+        rename { fileName ->
+          fileName.replace(".template", "")
+        }
+        fileMode = 0b111101101
+      }
+      copy {
+        from(projectDir.dir("licenses")) { into("package/licenses") }
+        from(projectDir.file("LICENSE.bin")) { into("package") }
+        from(projectDir.file("NOTICE.bin")) { into("package") }
+        from(projectDir.file("README.md")) { into("package") }
+        into(outputDir)
+        rename { fileName ->
+          fileName.replace(".bin", "")
+        }
+      }
     }
-    if (execResult.exitValue == 0) {
-      project.extra["macDockerConnector"] = true
+  }
+
+  val assembleDistribution by registering(Tar::class) {
+    group = "gravitino distribution"
+    finalizedBy("checksumDistribution")
+    into("${rootProject.name}-$version-bin")
+    from(compileDistribution.map { it.outputs.files.single() })
+    compression = Compression.GZIP
+    archiveFileName.set("${rootProject.name}-$version-bin.tar.gz")
+    destinationDirectory.set(projectDir.dir("distribution"))
+  }
+
+  register("copySubprojectDependencies", Copy::class) {
+    subprojects.forEach() {
+      from(it.configurations.runtimeClasspath)
+      into("distribution/package/libs")
     }
-  } catch (e: Exception) {
-    println("checkContainerRunning command execution failed: ${e.message}")
+  }
+
+  register("copySubprojectLib", Copy::class) {
+    subprojects.forEach() {
+      dependsOn("${it.name}:build")
+      from("${it.name}/build/libs")
+      into("distribution/package/libs")
+      include("*.jar")
+      setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    }
+  }
+
+  val cleanDistribution by registering(Delete::class) {
+    group = "gravitino distribution"
+    delete(outputDir)
+  }
+
+  clean {
+    dependsOn(cleanDistribution)
   }
 }
-
-fun checkDockerStatus() {
-  try {
-    val process = ProcessBuilder("docker", "info").start()
-    val exitCode = process.waitFor()
-
-    if (exitCode == 0) {
-      project.extra["dockerRunning"] = true
-    } else {
-      println("checkDockerStatus command execution failed with exit code $exitCode")
-    }
-  } catch (e: IOException) {
-    println("checkDockerStatus command execution failed: ${e.message}")
-  }
-}
-
-fun checkOrbStackStatus() {
-  if (!OperatingSystem.current().isMacOsX()) {
-    return
-  }
-
-  try {
-    val process = ProcessBuilder("docker", "context", "show").start()
-    val exitCode = process.waitFor()
-    if (exitCode == 0) {
-      val currentContext = process.inputStream.bufferedReader().readText()
-      println("Current docker context is: $currentContext")
-      project.extra["isOrbStack"] = currentContext.lowercase(Locale.getDefault()).contains("orbstack")
-    } else {
-      println("checkOrbStackStatus Command execution failed with exit code $exitCode")
-    }
-  } catch (e: IOException) {
-    println("checkOrbStackStatus command execution failed: ${e.message}")
-  }
-}
-
-printDockerCheckInfo()
-*/
