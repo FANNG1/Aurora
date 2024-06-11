@@ -6,8 +6,8 @@ package com.datastrato.aurora.web.rest;
 
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import com.datastrato.aurora.metrics.MetricNames;
 import com.datastrato.aurora.web.IcebergRestUtils;
-import com.datastrato.gravitino.metrics.MetricNames;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

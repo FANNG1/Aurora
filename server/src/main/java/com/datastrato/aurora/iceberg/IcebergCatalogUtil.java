@@ -4,6 +4,7 @@
  */
 package com.datastrato.aurora.iceberg;
 
+import com.datastrato.aurora.config.IcebergServerConfig;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +39,11 @@ public class IcebergCatalogUtil {
   }
 
   private static JdbcCatalog loadJdbcCatalog(Map<String, String> properties) {
-    IcebergConfig icebergConfig = new IcebergConfig(properties);
+    IcebergServerConfig icebergConfig = new IcebergServerConfig(properties);
     String driverClassName = icebergConfig.getJdbcDriver();
 
-    icebergConfig.get(IcebergConfig.JDBC_USER);
-    icebergConfig.get(IcebergConfig.JDBC_PASSWORD);
+    icebergConfig.get(IcebergServerConfig.JDBC_USER);
+    icebergConfig.get(IcebergServerConfig.JDBC_PASSWORD);
 
     try {
       // Load the jdbc driver

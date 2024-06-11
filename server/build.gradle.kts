@@ -14,13 +14,14 @@ dependencies {
   implementation(libs.bundles.jersey)
   implementation(libs.bundles.log4j)
   implementation(libs.bundles.gravitino)
+  implementation(libs.bundles.metrics)
+  implementation(libs.bundles.prometheus)
   implementation(libs.commons.lang3)
   implementation(libs.guava)
   implementation(libs.jackson.annotations)
   implementation(libs.jackson.datatype.jdk8)
   implementation(libs.jackson.datatype.jsr310)
   implementation(libs.jackson.databind)
-  implementation(libs.metrics.jersey2)
 
   // As of Java 9 or newer, the javax.activation package (needed by the jetty server) is no longer part of the JDK. It was removed because it was part of the
   // JavaBeans Activation Framework (JAF) which has been removed from Java SE. So we need to add it as a dependency. For more,
@@ -73,7 +74,6 @@ dependencies {
   }
   implementation(libs.hadoop2.hdfs)
   implementation(libs.hadoop2.mapreduce.client.core)
-  implementation(libs.metrics.jersey2)
 
   annotationProcessor(libs.lombok)
   compileOnly(libs.lombok)

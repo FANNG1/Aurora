@@ -4,17 +4,15 @@
  */
 package com.datastrato.aurora.server;
 
-import com.datastrato.aurora.iceberg.IcebergConfig;
+import com.datastrato.aurora.config.IcebergServerConfig;
 import com.datastrato.aurora.iceberg.IcebergTableOps;
+import com.datastrato.aurora.metrics.MetricsSystem;
+import com.datastrato.aurora.metrics.source.HttpServerMetricsSource;
+import com.datastrato.aurora.metrics.source.JVMMetricsSource;
+import com.datastrato.aurora.metrics.source.MetricsSource;
 import com.datastrato.aurora.web.IcebergExceptionMapper;
 import com.datastrato.aurora.web.IcebergObjectMapperProvider;
 import com.datastrato.aurora.web.metrics.IcebergMetricsManager;
-import com.datastrato.gravitino.metrics.MetricsSystem;
-import com.datastrato.gravitino.metrics.source.JVMMetricsSource;
-import com.datastrato.gravitino.metrics.source.MetricsSource;
-import com.datastrato.gravitino.server.web.HttpServerMetricsSource;
-import com.datastrato.gravitino.server.web.JettyServer;
-import com.datastrato.gravitino.server.web.JettyServerConfig;
 import java.io.File;
 import java.util.Properties;
 import javax.servlet.Servlet;
@@ -31,7 +29,7 @@ public class IcebergRESTServer extends ResourceConfig {
 
   public static final String CONF_FILE = "aurora.conf";
 
-  private final ServerConfig serverConfig;
+  private final IcebergServerConfig serverConfig;
 
   private final JettyServer server;
 
@@ -43,15 +41,14 @@ public class IcebergRESTServer extends ResourceConfig {
   private IcebergTableOps icebergTableOps;
   private IcebergMetricsManager icebergMetricsManager;
 
-  public IcebergRESTServer(ServerConfig config) {
+  public IcebergRESTServer(IcebergServerConfig config) {
     this.serverConfig = config;
     this.server = new JettyServer();
     this.metricsSystem = new MetricsSystem();
   }
 
-  public void initialize(IcebergConfig icebergConfig) {
-    JettyServerConfig serverConfig = JettyServerConfig.fromConfig(icebergConfig);
-    server.initialize(serverConfig, SERVICE_NAME, false /* shouldEnableUI */);
+  public void initialize() {
+    server.initialize(serverConfig, SERVICE_NAME, metricsSystem);
 
     metricsSystem.register(new JVMMetricsSource());
 
@@ -64,8 +61,8 @@ public class IcebergRESTServer extends ResourceConfig {
         new HttpServerMetricsSource(MetricsSource.ICEBERG_REST_SERVER_METRIC_NAME, config, server);
     metricsSystem.register(httpServerMetricsSource);
 
-    icebergTableOps = new IcebergTableOps(icebergConfig);
-    icebergMetricsManager = new IcebergMetricsManager(icebergConfig);
+    icebergTableOps = new IcebergTableOps(serverConfig);
+    icebergMetricsManager = new IcebergMetricsManager(serverConfig);
     config.register(
         new AbstractBinder() {
           @Override
@@ -78,7 +75,6 @@ public class IcebergRESTServer extends ResourceConfig {
     Servlet servlet = new ServletContainer(config);
     server.addServlet(servlet, ICEBERG_SPEC);
     server.addCustomFilters(ICEBERG_SPEC);
-    server.addSystemFilters(ICEBERG_SPEC);
   }
 
   public void start() {
@@ -113,10 +109,9 @@ public class IcebergRESTServer extends ResourceConfig {
   public static void main(String[] args) {
     LOG.info("Starting Iceberg REST Server");
     String confPath = System.getenv("GRAVITINO_TEST") == null ? "" : args[0];
-    ServerConfig serverConfig = loadConfig(confPath);
+    IcebergServerConfig serverConfig = loadConfig(confPath);
     IcebergRESTServer server = new IcebergRESTServer(serverConfig);
-    IcebergConfig config = new IcebergConfig();
-    server.initialize(config);
+    server.initialize();
 
     try {
       server.start();
@@ -132,7 +127,8 @@ public class IcebergRESTServer extends ResourceConfig {
                 () -> {
                   try {
                     // Register some clean-up tasks that need to be done before shutting down
-                    Thread.sleep(server.serverConfig.get(ServerConfig.SERVER_SHUTDOWN_TIMEOUT));
+                    Thread.sleep(
+                        server.serverConfig.get(IcebergServerConfig.SERVER_SHUTDOWN_TIMEOUT));
                   } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     LOG.error("Interrupted exception:", e);
@@ -152,8 +148,8 @@ public class IcebergRESTServer extends ResourceConfig {
     }
   }
 
-  static ServerConfig loadConfig(String confPath) {
-    ServerConfig serverConfig = new ServerConfig();
+  static IcebergServerConfig loadConfig(String confPath) {
+    IcebergServerConfig serverConfig = new IcebergServerConfig();
     try {
       if (confPath.isEmpty()) {
         // Load default conf

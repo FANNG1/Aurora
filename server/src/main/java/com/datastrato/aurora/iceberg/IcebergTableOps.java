@@ -4,6 +4,7 @@
  */
 package com.datastrato.aurora.iceberg;
 
+import com.datastrato.aurora.config.IcebergServerConfig;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Optional;
@@ -35,11 +36,11 @@ public class IcebergTableOps implements AutoCloseable {
   private final String catalogType;
   // private String catalogUri = null;
 
-  public IcebergTableOps(IcebergConfig icebergConfig) {
-    this.catalogType = icebergConfig.get(IcebergConfig.CATALOG_BACKEND);
+  public IcebergTableOps(IcebergServerConfig icebergConfig) {
+    this.catalogType = icebergConfig.get(IcebergServerConfig.CATALOG_BACKEND);
     if (!IcebergCatalogBackend.MEMORY.name().equalsIgnoreCase(catalogType)) {
-      icebergConfig.get(IcebergConfig.CATALOG_WAREHOUSE);
-      // this.catalogUri = icebergConfig.get(IcebergConfig.CATALOG_URI);
+      icebergConfig.get(IcebergServerConfig.CATALOG_WAREHOUSE);
+      // this.catalogUri = icebergConfig.get(IcebergServerConfig.CATALOG_URI);
     }
     catalog = IcebergCatalogUtil.loadCatalogBackend(catalogType, icebergConfig.getAllConfig());
     if (catalog instanceof SupportsNamespaces) {
@@ -48,7 +49,7 @@ public class IcebergTableOps implements AutoCloseable {
   }
 
   public IcebergTableOps() {
-    this(new IcebergConfig(Collections.emptyMap()));
+    this(new IcebergServerConfig(Collections.emptyMap()));
   }
 
   private void validateNamespace(Optional<Namespace> namespace) {
