@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.rest;
 
-
 import com.datastrato.aurora.config.IcebergServerConfig;
 import com.datastrato.aurora.iceberg.IcebergTableOps;
 import com.datastrato.aurora.web.IcebergExceptionMapper;

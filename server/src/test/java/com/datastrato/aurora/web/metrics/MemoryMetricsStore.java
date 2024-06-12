@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.metrics;
 
-
 import java.time.Instant;
 import java.util.Map;
 import org.apache.iceberg.metrics.MetricsReport;

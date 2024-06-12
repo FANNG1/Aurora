@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.rest;
 
-
 import java.util.Optional;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;

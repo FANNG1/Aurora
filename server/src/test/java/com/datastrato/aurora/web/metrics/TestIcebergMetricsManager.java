@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.metrics;
 
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 

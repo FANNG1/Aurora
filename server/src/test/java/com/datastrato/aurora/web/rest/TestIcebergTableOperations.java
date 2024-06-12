@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.rest;
 
-
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.Set;

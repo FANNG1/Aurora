@@ -5,7 +5,6 @@
 
 package com.datastrato.aurora.web.rest;
 
-
 import com.datastrato.aurora.web.IcebergObjectMapperProvider;
 import com.google.common.base.Joiner;
 import java.util.Map;
@@ -18,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
 import org.junit.jupiter.api.Assertions;
 
 public class IcebergTestBase extends JerseyTest {
