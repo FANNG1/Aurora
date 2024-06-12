@@ -28,9 +28,9 @@ public class TestConfig {
   @BeforeEach
   public void setUp() {
     props.setProperty("test", "test");
-    props.setProperty("gravitino.test.test-string", "test-string");
-    props.setProperty("gravitino.test.test-int", "  1  ");
-    props.setProperty("gravitino.test.test-boolean", "true");
+    props.setProperty("aurora.test-string", "test-string");
+    props.setProperty("aurora.test-int", "  1  ");
+    props.setProperty("aurora.test-boolean", "true");
 
     props.forEach((k, v) -> System.setProperty((String) k, (String) v));
   }
@@ -45,7 +45,7 @@ public class TestConfig {
     ConfigEntry<String> stringConf =
         new ConfigBuilder("test").stringConf().createWithDefault("test-default");
     ConfigEntry<Optional<Integer>> intConf =
-        new ConfigBuilder("gravitino.test.test-int").intConf().createWithOptional();
+        new ConfigBuilder("aurora.test-int").intConf().createWithOptional();
     ConfigEntry<String> stringConf1 = new ConfigBuilder("test").stringConf();
 
     DummyConfig config = new DummyConfig(true);
@@ -74,9 +74,8 @@ public class TestConfig {
 
       ConfigEntry<String> stringConf =
           new ConfigBuilder("test").stringConf().createWithDefault("test-default");
-      ConfigEntry<Integer> intConf = new ConfigBuilder("gravitino.test.test-int").intConf();
-      ConfigEntry<Boolean> booleanConf =
-          new ConfigBuilder("gravitino.test.test-boolean").booleanConf();
+      ConfigEntry<Integer> intConf = new ConfigBuilder("aurora.test-int").intConf();
+      ConfigEntry<Boolean> booleanConf = new ConfigBuilder("aurora.test-boolean").booleanConf();
 
       // Do not load default system properties, loading from file.
       DummyConfig config = new DummyConfig(false);
@@ -104,9 +103,9 @@ public class TestConfig {
   @Test
   public void testGetAndSet() {
     ConfigEntry<Optional<Integer>> intConf =
-        new ConfigBuilder("gravitino.test.test-int").intConf().createWithOptional();
+        new ConfigBuilder("aurora.test-int").intConf().createWithOptional();
     ConfigEntry<Boolean> booleanConf =
-        new ConfigBuilder("gravitino.test.test-boolean").booleanConf().createWithDefault(false);
+        new ConfigBuilder("aurora.test-boolean").booleanConf().createWithDefault(false);
 
     DummyConfig config = new DummyConfig(true);
 
