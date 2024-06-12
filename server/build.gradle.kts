@@ -93,15 +93,5 @@ dependencies {
   testImplementation(libs.mockito.core)
   testImplementation(libs.testcontainers)
 
-  testImplementation("org.apache.iceberg:iceberg-spark-runtime-2.12_3.4:1.4.3")
-  // testImplementation("org.apache.spark:spark-hive_2.12:3.4.1")
-  testImplementation("org.apache.spark:spark-sql_2.12:3.4.1") {
-    exclude("org.apache.avro")
-    exclude("org.apache.hadoop")
-    exclude("org.apache.zookeeper")
-    exclude("io.dropwizard.metrics")
-    exclude("org.rocksdb")
-  }
-
   testRuntimeOnly(libs.junit.jupiter.engine)
 }
